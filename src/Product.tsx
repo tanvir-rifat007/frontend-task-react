@@ -52,6 +52,8 @@ function Product() {
 
   const [size, setSize] = useState("S");
 
+  const [showModal, setShowModal] = useState(false);
+
   const increaseQuantity = () => setQuantity(quantity + 1);
   const decreaseQuantity = () => setQuantity(Math.max(0, quantity - 1));
 
@@ -125,8 +127,8 @@ function Product() {
                         className={size === sizeOption ? "selected-size" : ""}
                         onClick={() => setSize(sizeOption)}
                       >
-                        <span>{sizeOption}</span> $
-                        {PRICE[sizeOption as keyof typeof PRICE]}
+                        <span>{sizeOption}</span>
+                        <span>${PRICE[sizeOption as keyof typeof PRICE]}</span>
                       </button>
                     </li>
                   ))}
@@ -165,16 +167,39 @@ function Product() {
                 type="button"
                 className="add-to-cart"
                 onClick={() => {
-                  setCart([
-                    ...cart,
-                    {
-                      name: PRODUCT.name,
-                      color: selectedColor.name,
-                      quantity,
-                      price: PRICE[size as keyof typeof PRICE],
-                      size: size as "S" | "M" | "L" | "XL",
-                    },
-                  ]);
+                  const existingItemIndex = cart.findIndex(
+                    (item) =>
+                      item.name === PRODUCT.name &&
+                      item.color === selectedColor.name &&
+                      item.size === size,
+                  );
+
+                  // if already in cart, update the quantity
+
+                  if (existingItemIndex !== -1) {
+                    const updatedCart = [...cart];
+                    const existingItem = updatedCart[existingItemIndex];
+                    updatedCart[existingItemIndex] = {
+                      ...existingItem,
+                      quantity: existingItem.quantity + quantity,
+                      price:
+                        existingItem.price +
+                        PRICE[size as keyof typeof PRICE] * quantity,
+                    };
+                    setCart(updatedCart);
+                  } else {
+                    // Add a new item to the cart
+                    setCart([
+                      ...cart,
+                      {
+                        name: PRODUCT.name,
+                        color: selectedColor.name,
+                        quantity,
+                        price: PRICE[size as keyof typeof PRICE] * quantity,
+                        size: size as "S" | "M" | "L" | "XL",
+                      },
+                    ]);
+                  }
                 }}
                 disabled={quantity === 0}
                 style={{
@@ -193,11 +218,97 @@ function Product() {
       {/* Checkout */}
 
       <footer>
-        <button type="button">
+        <button
+          onClick={() => setShowModal(true)}
+          type="button"
+          disabled={cart.length === 0}
+          style={{
+            cursor: cart.length === 0 ? "not-allowed" : "pointer",
+          }}
+        >
           Checkout{" "}
           <span>{cart.reduce((acc, item) => acc + item.quantity, 0)}</span>
         </button>
       </footer>
+
+      {showModal && (
+        <div id="modal">
+          <div className="modal-content">
+            <span className="close" onClick={() => setShowModal(false)}>
+              &times;
+            </span>
+            <section className="cart">
+              <h2>Your Cart</h2>
+
+              <table>
+                <thead>
+                  <tr>
+                    <th>Item</th>
+                    <th>Color</th>
+                    <th>Size</th>
+                    <th>Qnt</th>
+                    <th>Price</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {cart.map((item) => (
+                    <tr key={item.name + item.color + item.size}>
+                      <td>
+                        <img
+                          src={
+                            item.color === "Purple"
+                              ? "/assets/images/img1.jpeg"
+                              : item.color === "Black"
+                                ? "/assets/images/img2.jpeg"
+                                : item.color === "Blue"
+                                  ? "/assets/images/img3.jpeg"
+                                  : "/assets/images/img4.jpeg"
+                          }
+                          alt="Classy Modern Smart Watch"
+                        />
+                        Classy Modern Smart Watch
+                      </td>
+                      <td>{item.color}</td>
+                      <td>
+                        <strong>{item.size}</strong>
+                      </td>
+                      <td>{item.quantity}</td>
+                      <td>
+                        <strong>${item.price.toFixed(2)}</strong>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <td colSpan={3}>Total</td>
+                    <td>
+                      <strong>
+                        {cart.reduce((acc, item) => acc + item.quantity, 0)}
+                      </strong>
+                    </td>
+                    <td>
+                      <strong>
+                        $
+                        {cart
+                          .reduce((acc, item) => acc + item.price, 0)
+                          .toFixed(2)}
+                      </strong>
+                    </td>
+                  </tr>
+                </tfoot>
+              </table>
+
+              <div className="cart-actions">
+                <button type="button">Continue Shopping</button>
+                <button type="button" className="checkout">
+                  Checkout
+                </button>
+              </div>
+            </section>
+          </div>
+        </div>
+      )}
     </>
   );
 }
