@@ -10,6 +10,7 @@
     "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx}\"",
     "preview": "vite preview",
     "test": "vitest",
+    "test:coverage": "vitest --coverage",
     "prepare": "husky"
   },
   "dependencies": {
