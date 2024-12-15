@@ -150,6 +150,7 @@ function Product() {
                   type="number"
                   id="quantity"
                   name="quantity"
+                  data-testid="quantity-input"
                   min="1"
                   value={quantity}
                   onChange={(e) => setQuantity(Number(e.target.value))}
@@ -159,6 +160,7 @@ function Product() {
                   type="button"
                   aria-label="Increase quantity"
                   onClick={increaseQuantity}
+                  data-testid="increase-quantity"
                 >
                   +
                 </button>
