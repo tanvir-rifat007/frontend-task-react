@@ -1,21 +1,74 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import "./Product.css";
 
-import Img1 from "./assets/images/img1.jpeg";
+const PRODUCT = {
+  name: "Classy Modern Smart Watch",
+  colors: [
+    {
+      name: "Purple",
+      hex: "#8e44ad",
+      image: "/assets/images/img1.jpeg",
+    },
+    {
+      name: "Black",
+      hex: "#2c3e50",
+      image: "/assets/images/img2.jpeg",
+    },
+
+    {
+      name: "Blue",
+      hex: "#4c97d3",
+      image: "/assets/images/img3.jpeg",
+    },
+
+    {
+      name: "Teal",
+      hex: "#1abc9c",
+      image: "/assets/images/img4.jpeg",
+    },
+  ],
+};
+
+type Cart = {
+  name: string;
+  color: string;
+  quantity: number;
+  price: number;
+  size: "S" | "M" | "L" | "XL";
+};
+
+const PRICE = {
+  S: 79.0,
+  M: 89.0,
+  L: 99.0,
+  XL: 109.0,
+};
 
 function Product() {
+  const [selectedColor, setSelectedColor] = useState(PRODUCT.colors[0]);
   const [quantity, setQuantity] = useState(0);
+  const [cart, setCart] = useState<Cart[]>([]);
+
+  const [size, setSize] = useState("S");
 
   const increaseQuantity = () => setQuantity(quantity + 1);
   const decreaseQuantity = () => setQuantity(Math.max(0, quantity - 1));
+
+  useEffect(() => {
+    console.log(cart);
+  }, [cart]);
 
   return (
     <>
       <main>
         <section className="product-container">
           <figure className="product-image">
-            <img src={Img1} alt="Classy Modern Smart Watch" />
+            <img
+              src={selectedColor.image}
+              alt={PRODUCT.name}
+              style={{ borderColor: selectedColor.hex }}
+            />
           </figure>
 
           {/* Product Details */}
@@ -44,36 +97,21 @@ function Product() {
               </p>
             </section>
 
-            {/* Product Specifications */}
             <section className="product-options">
               {/* Band Color */}
               <div>
                 <h3>Band Color</h3>
                 <ul className="color-options">
-                  <li>
-                    <button
-                      style={{ backgroundColor: "#8e44ad" }}
-                      aria-label="Purple Band"
-                    ></button>
-                  </li>
-                  <li>
-                    <button
-                      style={{ backgroundColor: "#2c3e50" }}
-                      aria-label="Black Band"
-                    ></button>
-                  </li>
-                  <li>
-                    <button
-                      style={{ backgroundColor: "#1abc9c" }}
-                      aria-label="Teal Band"
-                    ></button>
-                  </li>
-                  <li>
-                    <button
-                      style={{ backgroundColor: "#4c97d3" }}
-                      aria-label="Blue Band"
-                    ></button>
-                  </li>
+                  {PRODUCT.colors.map((color) => (
+                    <li key={color.name}>
+                      <button
+                        style={{ backgroundColor: color.hex }}
+                        onClick={() => setSelectedColor(color)}
+                      >
+                        {selectedColor.name === color.name ? "✓" : ""}
+                      </button>
+                    </li>
+                  ))}
                 </ul>
               </div>
 
@@ -81,26 +119,17 @@ function Product() {
               <div>
                 <h3>Wrist Size</h3>
                 <ul className="size-options">
-                  <li>
-                    <button>
-                      <span>S</span> $69
-                    </button>
-                  </li>
-                  <li>
-                    <button>
-                      <span>M</span> $79
-                    </button>
-                  </li>
-                  <li>
-                    <button>
-                      <span>L</span> $89
-                    </button>
-                  </li>
-                  <li>
-                    <button>
-                      <span>XL</span> $99
-                    </button>
-                  </li>
+                  {Object.keys(PRICE).map((sizeOption) => (
+                    <li key={sizeOption}>
+                      <button
+                        className={size === sizeOption ? "selected-size" : ""}
+                        onClick={() => setSize(sizeOption)}
+                      >
+                        <span>{sizeOption}</span> $
+                        {PRICE[sizeOption as keyof typeof PRICE]}
+                      </button>
+                    </li>
+                  ))}
                 </ul>
               </div>
             </section>
@@ -132,7 +161,26 @@ function Product() {
                   +
                 </button>
               </div>
-              <button type="button" className="add-to-cart">
+              <button
+                type="button"
+                className="add-to-cart"
+                onClick={() => {
+                  setCart([
+                    ...cart,
+                    {
+                      name: PRODUCT.name,
+                      color: selectedColor.name,
+                      quantity,
+                      price: PRICE[size as keyof typeof PRICE],
+                      size: size as "S" | "M" | "L" | "XL",
+                    },
+                  ]);
+                }}
+                disabled={quantity === 0}
+                style={{
+                  cursor: quantity === 0 ? "not-allowed" : "pointer",
+                }}
+              >
                 Add to Cart
               </button>
               <button type="button" aria-label="Like Product">
@@ -146,7 +194,8 @@ function Product() {
 
       <footer>
         <button type="button">
-          Checkout <span>2</span>
+          Checkout{" "}
+          <span>{cart.reduce((acc, item) => acc + item.quantity, 0)}</span>
         </button>
       </footer>
     </>
