@@ -99,6 +99,18 @@ function Product() {
               </p>
             </section>
 
+            <section className="product-type-model">
+              <div>
+                <p>Type</p>
+                <span>Watch</span>
+              </div>
+
+              <div>
+                <p>Model Number</p>
+                <span>Forerunner 290XT</span>
+              </div>
+            </section>
+
             <section className="product-options">
               {/* Band Color */}
               <div>
