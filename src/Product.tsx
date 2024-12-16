@@ -1,49 +1,9 @@
 import { useEffect, useState } from "react";
 
 import "./Product.css";
-
-const PRODUCT = {
-  name: "Classy Modern Smart Watch",
-  colors: [
-    {
-      name: "Purple",
-      hex: "#8e44ad",
-      image: "/assets/images/img1.jpeg",
-    },
-    {
-      name: "Black",
-      hex: "#2c3e50",
-      image: "/assets/images/img2.jpeg",
-    },
-
-    {
-      name: "Blue",
-      hex: "#4c97d3",
-      image: "/assets/images/img3.jpeg",
-    },
-
-    {
-      name: "Teal",
-      hex: "#1abc9c",
-      image: "/assets/images/img4.jpeg",
-    },
-  ],
-};
-
-type Cart = {
-  name: string;
-  color: string;
-  quantity: number;
-  price: number;
-  size: "S" | "M" | "L" | "XL";
-};
-
-const PRICE = {
-  S: 79.0,
-  M: 89.0,
-  L: 99.0,
-  XL: 109.0,
-};
+import { PRICE, PRODUCT } from "./utils/utils";
+import { Cart } from "./cart";
+import ModalChildren from "./ModalChildren";
 
 function Product() {
   const [selectedColor, setSelectedColor] = useState(PRODUCT.colors[0]);
@@ -245,84 +205,7 @@ function Product() {
         </button>
       </footer>
 
-      {showModal && (
-        <div id="modal">
-          <div className="modal-content">
-            <span className="close" onClick={() => setShowModal(false)}>
-              &times;
-            </span>
-            <section className="cart">
-              <h2>Your Cart</h2>
-
-              <table>
-                <thead>
-                  <tr>
-                    <th>Item</th>
-                    <th>Color</th>
-                    <th>Size</th>
-                    <th>Qnt</th>
-                    <th>Price</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {cart.map((item) => (
-                    <tr key={item.name + item.color + item.size}>
-                      <td>
-                        <img
-                          src={
-                            item.color === "Purple"
-                              ? "/assets/images/img1.jpeg"
-                              : item.color === "Black"
-                                ? "/assets/images/img2.jpeg"
-                                : item.color === "Blue"
-                                  ? "/assets/images/img3.jpeg"
-                                  : "/assets/images/img4.jpeg"
-                          }
-                          alt="Classy Modern Smart Watch"
-                        />
-                        Classy Modern Smart Watch
-                      </td>
-                      <td>{item.color}</td>
-                      <td>
-                        <strong>{item.size}</strong>
-                      </td>
-                      <td>{item.quantity}</td>
-                      <td>
-                        <strong>${item.price.toFixed(2)}</strong>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-                <tfoot>
-                  <tr>
-                    <td colSpan={3}>Total</td>
-                    <td>
-                      <strong>
-                        {cart.reduce((acc, item) => acc + item.quantity, 0)}
-                      </strong>
-                    </td>
-                    <td>
-                      <strong>
-                        $
-                        {cart
-                          .reduce((acc, item) => acc + item.price, 0)
-                          .toFixed(2)}
-                      </strong>
-                    </td>
-                  </tr>
-                </tfoot>
-              </table>
-
-              <div className="cart-actions">
-                <button type="button">Continue Shopping</button>
-                <button type="button" className="checkout">
-                  Checkout
-                </button>
-              </div>
-            </section>
-          </div>
-        </div>
-      )}
+      {showModal && <ModalChildren setShowModal={setShowModal} cart={cart} />}
     </>
   );
 }
